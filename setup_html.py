@@ -45,6 +45,76 @@ html_content = html_content.replace(
 
 script = """
 <script>
+let map;
+let markers = [];
+
+async function toggleMap(show) {
+    const overlay = document.getElementById('map-overlay');
+    if (!overlay) return;
+    if (show) {
+        overlay.classList.remove('hidden');
+        setTimeout(() => overlay.style.opacity = '1', 10);
+        if (!map) initMap();
+        loadMapData();
+    } else {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.classList.add('hidden'), 500);
+    }
+}
+
+function initMap() {
+    map = L.map('map', {
+        zoomControl: false,
+        attributionControl: false
+    }).setView([20.5937, 78.9629], 5); // Center on India
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+    }).addTo(map);
+    
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+}
+
+async function loadMapData() {
+    try {
+        const response = await fetch('/get-global-data');
+        const cities = await response.json();
+        
+        // Clear old markers
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+
+        cities.forEach(city => {
+            const color = city.risk_level === 'Low' ? '#83e881' : (city.risk_level === 'Medium' ? '#feb300' : '#ff716c');
+            
+            const marker = L.circleMarker([city.lat || 0, city.lon || 0], {
+                radius: 12,
+                fillColor: color,
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map);
+
+            const popupContent = `
+                <div class="p-2 min-w-[150px]">
+                    <h4 class="text-lg font-bold mb-2">${city.city}</h4>
+                    <div class="space-y-1 text-sm">
+                        <p class="flex justify-between"><span>Temp:</span> <span class="text-primary font-bold">${city.temperature}°C</span></p>
+                        <p class="flex justify-between"><span>AQI:</span> <span class="text-tertiary font-bold">${city.aqi}</span></p>
+                        <p class="flex justify-between"><span>Risk:</span> <span class="font-bold" style="color:${color}">${city.risk_score.toFixed(1)}</span></p>
+                        <p class="text-center mt-2 font-black uppercase text-[10px] tracking-widest" style="color:${color}">${city.risk_level} Risk</p>
+                    </div>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+            markers.push(marker);
+        });
+    } catch (e) {
+        console.error("Map load error:", e);
+    }
+}
+
 async function executeRiskAnalysis() {
     const city = document.getElementById('city-input').value;
     if (!city) return;
@@ -178,6 +248,12 @@ document.getElementById('city-input').addEventListener('keypress', function (e) 
         executeRiskAnalysis();
     }
 });
+
+const mapBtn = document.getElementById('view-map-btn');
+if(mapBtn) mapBtn.addEventListener('click', () => toggleMap(true));
+
+const closeMapBtn = document.getElementById('close-map-btn');
+if(closeMapBtn) closeMapBtn.addEventListener('click', () => toggleMap(false));
 </script>
 </body>
 """

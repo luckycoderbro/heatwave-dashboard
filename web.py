@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify
 import requests
 
 app = Flask(__name__)
+CITIES = ["Delhi", "Mumbai", "Chennai", "Kolkata", "Bangalore", "Hyderabad", "Ahmedabad", "Pune", "Jaipur", "Lucknow"]
+
 @app.after_request
 def add_header(response):
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
@@ -87,6 +89,15 @@ def get_risk():
     
     result = fetch_data(city)
     return jsonify(result)
+
+@app.route("/get-global-data", methods=["GET"])
+def get_global_data():
+    results = []
+    for city in CITIES:
+        data = fetch_data(city)
+        if "error" not in data:
+            results.append(data)
+    return jsonify(results)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
