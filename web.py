@@ -2,6 +2,13 @@ from flask import Flask, render_template, request, jsonify
 import requests
 
 app = Flask(__name__)
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
+
 
 API_KEY = "d22989cb56cb3df66e315574b01cd7c1"
 WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
