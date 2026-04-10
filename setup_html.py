@@ -123,18 +123,49 @@ async function loadMapData() {
         }).addTo(map);
 
         const popupContent = `
-            <div class="p-2 min-w-[200px]">
-                <h4 class="text-xl font-bold mb-2 text-on-surface border-b border-outline-variant/20 pb-1">${city.city}</h4>
-                <div class="space-y-1 text-sm">
-                    <p class="flex justify-between gap-4"><span>Temperature:</span> <span class="text-primary font-bold">${city.temperature}°C</span></p>
-                    <p class="flex justify-between gap-4"><span>Humidity:</span> <span class="text-secondary font-bold">${city.humidity}%</span></p>
-                    <p class="flex justify-between gap-4"><span>AQI:</span> <span class="text-tertiary font-bold">${city.aqi}</span></p>
-                    <p class="flex justify-between gap-4"><span>Heat Index:</span> <span class="text-secondary font-bold">${city.heat_index.toFixed(1)}°C</span></p>
-                    <p class="flex justify-between gap-4"><span>Risk Score:</span> <span class="font-bold" style="color:${color}">${city.risk_score.toFixed(1)}</span></p>
-                    <div class="mt-4 pt-2 text-center">
-                        <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg" style="background:${color}; color:#000;">
-                            ${city.risk_level} Risk
+            <div class="p-6 min-w-[320px] bg-surface-container/90 backdrop-blur-xl rounded-[2rem] border border-outline-variant/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-fade-up">
+                <div class="mb-5 border-b border-outline-variant/10 pb-4">
+                    <div class="flex items-center gap-3 mb-1">
+                        <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                        <h4 class="text-2xl font-headline font-extrabold text-on-background tracking-tight">${city.city}</h4>
+                    </div>
+                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant/60">Live Risk Intelligence</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-y-4 gap-x-6">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-xs text-primary">device_thermostat</span> Temp
                         </span>
+                        <span class="text-lg font-headline font-bold text-primary">${city.temperature}<span class="text-xs ml-0.5 opacity-70">°C</span></span>
+                    </div>
+                    <div class="flex flex-col gap-1 text-right">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 flex items-center gap-1.5 justify-end">
+                            <span class="material-symbols-outlined text-xs text-secondary">humidity_percentage</span> Humidity
+                        </span>
+                        <span class="text-lg font-headline font-bold text-secondary">${city.humidity}<span class="text-xs ml-0.5 opacity-70">%</span></span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-xs text-tertiary">air</span> AQI
+                        </span>
+                        <span class="text-lg font-headline font-bold text-tertiary">${city.aqi}</span>
+                    </div>
+                    <div class="flex flex-col gap-1 text-right">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant/50 flex items-center gap-1.5 justify-end">
+                            <span class="material-symbols-outlined text-xs text-error">thermostat</span> Heat Index
+                        </span>
+                        <span class="text-lg font-headline font-bold text-error">${city.heat_index.toFixed(1)}<span class="text-xs ml-0.5 opacity-70">°C</span></span>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-5 border-t border-outline-variant/10 flex items-center justify-between">
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/40">Risk Score</span>
+                        <span class="text-2xl font-headline font-black text-on-background" style="color:${color}">${city.risk_score.toFixed(1)}</span>
+                    </div>
+                    <div class="px-5 py-2.5 rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.2)] flex items-center gap-2 border border-white/5" style="background: linear-gradient(135deg, ${color}, ${color}dd);">
+                         <span class="text-[11px] font-black uppercase tracking-[0.15em] text-on-primary-fixed">${city.risk_level} Risk</span>
                     </div>
                 </div>
             </div>
