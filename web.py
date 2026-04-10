@@ -65,6 +65,8 @@ def fetch_data(city):
 
         return {
             "city": city,
+            "lat": lat,
+            "lon": lon,
             "temperature": temp,
             "humidity": humidity,
             "aqi": aqi,
