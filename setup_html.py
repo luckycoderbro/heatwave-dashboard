@@ -76,58 +76,72 @@ function initMap() {
 }
 
 async function loadMapData() {
+    const input = document.getElementById('city-input');
+    const citySearch = input ? input.value : '';
+    
+    if (!citySearch) {
+        // If no city entered, don't show markers or center on a default (like India)
+        map.setView([20.5937, 78.9629], 5);
+        return;
+    }
+
     try {
-        const response = await fetch('/get-global-data');
-        const cities = await response.json();
+        const response = await fetch(`/get-risk?city=${encodeURIComponent(citySearch)}`);
+        const city = await response.json();
         
+        if (city.error) return;
+
         // Clear old markers
         markers.forEach(m => map.removeLayer(m));
         markers = [];
 
-        cities.forEach(city => {
-            const color = city.risk_level === 'Low' ? '#83e881' : (city.risk_level === 'Medium' ? '#feb300' : '#ff716c');
-            
-            // Dynamic radius based on risk score (min 10, max approx 20)
-            const radius = 10 + (city.risk_score / 10);
+        const color = city.risk_level === 'Low' ? '#83e881' : (city.risk_level === 'Medium' ? '#feb300' : '#ff716c');
+        const radius = 15;
 
-            // Glow effect using an outer circle
-            const glow = L.circleMarker([city.lat || 0, city.lon || 0], {
-                radius: radius + 4,
-                fillColor: color,
-                color: 'transparent',
-                fillOpacity: 0.2
-            }).addTo(map);
+        // Center map and zoom smoothly
+        map.flyTo([city.lat, city.lon], 10, {
+            animate: true,
+            duration: 1.5
+        });
 
-            const marker = L.circleMarker([city.lat || 0, city.lon || 0], {
-                radius: radius,
-                fillColor: color,
-                color: '#fff',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9,
-                className: 'marker-glow'
-            }).addTo(map);
+        // Glow effect
+        const glow = L.circleMarker([city.lat, city.lon], {
+            radius: radius + 8,
+            fillColor: color,
+            color: 'transparent',
+            fillOpacity: 0.2
+        }).addTo(map);
 
-            const popupContent = `
-                <div class="p-2 min-w-[180px]">
-                    <h4 class="text-lg font-bold mb-2 text-on-surface border-b border-outline-variant/20 pb-1">${city.city}</h4>
-                    <div class="space-y-1 text-sm">
-                        <p class="flex justify-between gap-4"><span>Temperature:</span> <span class="text-primary font-bold">${city.temperature}°C</span></p>
-                        <p class="flex justify-between gap-4"><span>Humidity:</span> <span class="text-secondary font-bold">${city.humidity}%</span></p>
-                        <p class="flex justify-between gap-4"><span>AQI:</span> <span class="text-tertiary font-bold">${city.aqi}</span></p>
-                        <p class="flex justify-between gap-4"><span>Heat Index:</span> <span class="text-secondary font-bold">${city.heat_index.toFixed(1)}°C</span></p>
-                        <p class="flex justify-between gap-4"><span>Risk Score:</span> <span class="font-bold" style="color:${color}">${city.risk_score.toFixed(1)}</span></p>
-                        <div class="mt-3 pt-2 text-center">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm" style="background:${color}22; color:${color}; border: 1px solid ${color}44">
-                                ${city.risk_level} Risk
-                            </span>
-                        </div>
+        const marker = L.circleMarker([city.lat, city.lon], {
+            radius: radius,
+            fillColor: color,
+            color: '#fff',
+            weight: 3,
+            opacity: 1,
+            fillOpacity: 0.9,
+            className: 'marker-glow'
+        }).addTo(map);
+
+        const popupContent = `
+            <div class="p-2 min-w-[200px]">
+                <h4 class="text-xl font-bold mb-2 text-on-surface border-b border-outline-variant/20 pb-1">${city.city}</h4>
+                <div class="space-y-1 text-sm">
+                    <p class="flex justify-between gap-4"><span>Temperature:</span> <span class="text-primary font-bold">${city.temperature}°C</span></p>
+                    <p class="flex justify-between gap-4"><span>Humidity:</span> <span class="text-secondary font-bold">${city.humidity}%</span></p>
+                    <p class="flex justify-between gap-4"><span>AQI:</span> <span class="text-tertiary font-bold">${city.aqi}</span></p>
+                    <p class="flex justify-between gap-4"><span>Heat Index:</span> <span class="text-secondary font-bold">${city.heat_index.toFixed(1)}°C</span></p>
+                    <p class="flex justify-between gap-4"><span>Risk Score:</span> <span class="font-bold" style="color:${color}">${city.risk_score.toFixed(1)}</span></p>
+                    <div class="mt-4 pt-2 text-center">
+                        <span class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg" style="background:${color}; color:#000;">
+                            ${city.risk_level} Risk
+                        </span>
                     </div>
                 </div>
-            `;
-            marker.bindPopup(popupContent);
-            markers.push(glow, marker);
-        });
+            </div>
+        `;
+        marker.bindPopup(popupContent).openPopup();
+        markers.push(glow, marker);
+
     } catch (e) {
         console.error("Map load error:", e);
     }
