@@ -97,6 +97,12 @@
         #map { height: 100%; width: 100%; }
         .leaflet-container { background: #0b0e14 !important; }
         .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #1c2028 !important; color: #e4e5ee !important; border: 1px solid rgba(255, 144, 109, 0.2); }
+        .marker-glow { filter: drop-shadow(0 0 5px currentColor); }
+        @keyframes pulse-glow {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-primary selection:text-on-primary-fixed">
@@ -597,28 +603,46 @@ async function loadMapData() {
         cities.forEach(city => {
             const color = city.risk_level === 'Low' ? '#83e881' : (city.risk_level === 'Medium' ? '#feb300' : '#ff716c');
             
+            // Dynamic radius based on risk score (min 10, max approx 20)
+            const radius = 10 + (city.risk_score / 10);
+
+            // Glow effect using an outer circle
+            const glow = L.circleMarker([city.lat || 0, city.lon || 0], {
+                radius: radius + 4,
+                fillColor: color,
+                color: 'transparent',
+                fillOpacity: 0.2
+            }).addTo(map);
+
             const marker = L.circleMarker([city.lat || 0, city.lon || 0], {
-                radius: 12,
+                radius: radius,
                 fillColor: color,
                 color: '#fff',
                 weight: 2,
                 opacity: 1,
-                fillOpacity: 0.8
+                fillOpacity: 0.9,
+                className: 'marker-glow'
             }).addTo(map);
 
             const popupContent = `
-                <div class="p-2 min-w-[150px]">
-                    <h4 class="text-lg font-bold mb-2">${city.city}</h4>
+                <div class="p-2 min-w-[180px]">
+                    <h4 class="text-lg font-bold mb-2 text-on-surface border-b border-outline-variant/20 pb-1">${city.city}</h4>
                     <div class="space-y-1 text-sm">
-                        <p class="flex justify-between"><span>Temp:</span> <span class="text-primary font-bold">${city.temperature}°C</span></p>
-                        <p class="flex justify-between"><span>AQI:</span> <span class="text-tertiary font-bold">${city.aqi}</span></p>
-                        <p class="flex justify-between"><span>Risk:</span> <span class="font-bold" style="color:${color}">${city.risk_score.toFixed(1)}</span></p>
-                        <p class="text-center mt-2 font-black uppercase text-[10px] tracking-widest" style="color:${color}">${city.risk_level} Risk</p>
+                        <p class="flex justify-between gap-4"><span>Temperature:</span> <span class="text-primary font-bold">${city.temperature}°C</span></p>
+                        <p class="flex justify-between gap-4"><span>Humidity:</span> <span class="text-secondary font-bold">${city.humidity}%</span></p>
+                        <p class="flex justify-between gap-4"><span>AQI:</span> <span class="text-tertiary font-bold">${city.aqi}</span></p>
+                        <p class="flex justify-between gap-4"><span>Heat Index:</span> <span class="text-secondary font-bold">${city.heat_index.toFixed(1)}°C</span></p>
+                        <p class="flex justify-between gap-4"><span>Risk Score:</span> <span class="font-bold" style="color:${color}">${city.risk_score.toFixed(1)}</span></p>
+                        <div class="mt-3 pt-2 text-center">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm" style="background:${color}22; color:${color}; border: 1px solid ${color}44">
+                                ${city.risk_level} Risk
+                            </span>
+                        </div>
                     </div>
                 </div>
             `;
             marker.bindPopup(popupContent);
-            markers.push(marker);
+            markers.push(glow, marker);
         });
     } catch (e) {
         console.error("Map load error:", e);
