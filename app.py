@@ -68,17 +68,20 @@ with col1:
 with col2:
     check = st.button("Analyze")
 
+WAQI_TOKEN = "cdbcc340bb91a5859bf0b18c5986deb0f63f0679"
+
 # ==============================
 # FUNCTIONS
 # ==============================
-def get_aqi(lat, lon):
+def fetch_aqi(city):
     try:
-        res = requests.get(AQI_URL, params={
-            "lat": lat,
-            "lon": lon,
-            "appid": API_KEY
-        })
-        return res.json()["list"][0]["main"]["aqi"]
+        url = f"https://api.waqi.info/feed/{city}/?token={WAQI_TOKEN}"
+        res = requests.get(url, timeout=10)
+        data = res.json()
+        if data["status"] == "ok":
+            aqi = data["data"]["aqi"]
+            return aqi if isinstance(aqi, (int, float)) else 0
+        return 0
     except:
         return 0
 
@@ -98,7 +101,7 @@ def fetch_data(city):
 
         heat_index = temp + (0.33 * humidity) - 0.7
 
-        aqi = get_aqi(lat, lon)
+        aqi = fetch_aqi(city)
 
         density = 10000
 

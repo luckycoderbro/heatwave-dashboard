@@ -10,9 +10,20 @@ print("🚀 MASTER SCRIPT STARTED...\n")
 
 API_KEY = "d22989cb56cb3df66e315574b01cd7c1"
 WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
-AQI_URL = "http://api.openweathermap.org/data/2.5/air_pollution"
 
-LOCATIONS = ["Delhi", "Mumbai", "Kolkata"]
+# WAQI TOKEN
+WAQI_TOKEN = "cdbcc340bb91a5859bf0b18c5986deb0f63f0679"
+
+LOCATIONS = [
+    "Amaravati","Itanagar","Dispur","Patna","Raipur","Panaji",
+    "Gandhinagar","Chandigarh","Shimla","Ranchi","Bengaluru",
+    "Thiruvananthapuram","Bhopal","Mumbai","Imphal","Shillong",
+    "Aizawl","Kohima","Bhubaneswar","Chandigarh","Jaipur",
+    "Gangtok","Chennai","Hyderabad","Agartala","Lucknow",
+    "Dehradun","Kolkata",
+    "Delhi","Port Blair","Daman","Silvassa","Srinagar",
+    "Leh","Kavaratti","Puducherry"
+]
 
 # ==============================
 # 📊 POPULATION DATA
@@ -28,20 +39,29 @@ df_pop = pd.DataFrame(population_data)
 df_pop["Density"] = df_pop["Population"] / df_pop["Area_km2"]
 
 # ==============================
-# 🌫️ AQI FUNCTION
+# 🌫️ AQI FUNCTION (FIXED)
 # ==============================
 
-def fetch_aqi(lat, lon):
+def fetch_aqi(city):
     try:
-        res = requests.get(AQI_URL, params={
-            "lat": lat,
-            "lon": lon,
-            "appid": API_KEY
-        }, timeout=10)
-
+        url = f"https://api.waqi.info/feed/{city}/?token={WAQI_TOKEN}"
+        res = requests.get(url, timeout=10)
         data = res.json()
-        return data.get("list", [{}])[0].get("main", {}).get("aqi", 0)
-    except:
+
+        if data["status"] == "ok":
+            aqi = data["data"]["aqi"]
+
+            # Ensure numeric value
+            if isinstance(aqi, (int, float)):
+                return aqi
+            else:
+                return 0
+        else:
+            print(f"⚠️ No AQI data for {city}")
+            return 0
+
+    except Exception as e:
+        print("AQI Error:", e)
         return 0
 
 # ==============================
@@ -66,7 +86,9 @@ def fetch_weather(city):
         lon = data["coord"]["lon"]
 
         heat_index = temp + (0.33 * humidity) - 0.7
-        aqi = fetch_aqi(lat, lon)
+
+        # ✅ NEW AQI CALL
+        aqi = fetch_aqi(city)
 
         return {
             "City": city,
@@ -92,9 +114,16 @@ for city in LOCATIONS:
     r = fetch_weather(city)
     if r:
         records.append(r)
-    time.sleep(2)
+    time.sleep(1)
 
 df_weather = pd.DataFrame(records)
+
+# ==============================
+# 🔥 FIX AQI DATA TYPE (CRITICAL)
+# ==============================
+
+df_weather["AQI"] = pd.to_numeric(df_weather["AQI"], errors="coerce")
+df_weather["AQI"] = df_weather["AQI"].fillna(0)
 
 # ==============================
 # 🔗 MERGE DATA
@@ -138,3 +167,4 @@ print(df.head())
 # ==============================
 
 print("\n📊 Summary:\n", df.describe())
+
