@@ -175,7 +175,10 @@ async function loadMapData() {
                 </div>
             </div>
         `;
-        marker.bindPopup(popupContent).openPopup();
+        marker.bindPopup(popupContent, {
+            closeButton: false,
+            className: 'custom-popup'
+        }).openPopup();
         markers.push(glow, marker);
 
     } catch (e) {
