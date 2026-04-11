@@ -467,46 +467,278 @@
 </div>
 </div>
 </section>
-<section class="py-24 bg-surface-container-low">
-<div class="max-w-7xl mx-auto px-8">
-<div class="text-center mb-16">
-<h2 class="text-3xl font-headline font-bold mb-4">Technology Stack</h2>
-<p class="text-on-surface-variant">The engine behind the intelligence.</p>
-</div>
-            <div class="flex flex-wrap justify-center gap-12 items-center opacity-70">
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center">
-                        <span class="material-symbols-outlined text-4xl text-primary">terminal</span>
-                    </div>
-                    <span class="text-xs font-bold uppercase tracking-widest">Python</span>
-                </div>
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center">
-                        <span class="material-symbols-outlined text-4xl text-secondary">api</span>
-                    </div>
-                    <span class="text-xs font-bold uppercase tracking-widest">Flask</span>
-                </div>
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center">
-                        <span class="material-symbols-outlined text-4xl text-tertiary">code</span>
-                    </div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-center">HTML, CSS, JS</span>
-                </div>
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center">
-                        <span class="material-symbols-outlined text-4xl text-primary">cloud</span>
-                    </div>
-                    <span class="text-xs font-bold uppercase tracking-widest">OpenWeather API</span>
-                </div>
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center">
-                        <span class="material-symbols-outlined text-4xl text-secondary">air</span>
-                    </div>
-                    <span class="text-xs font-bold uppercase tracking-widest">WAQI API</span>
-                </div>
-            </div>
-</div>
+<style>
+  /* ── Tech Stack Premium Styles ── */
+  #tech-stack-section {
+    background: linear-gradient(180deg, #0e1117 0%, #10131a 100%);
+  }
+  .tech-section-title {
+    background: linear-gradient(90deg, #e4e5ee 0%, #a9abb3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.25rem;
+  }
+  @media (max-width: 1024px) { .tech-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px)  { .tech-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .tech-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 28px 20px 22px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.035);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    transition: transform 0.35s cubic-bezier(.22,1,.36,1),
+                box-shadow 0.35s cubic-bezier(.22,1,.36,1),
+                border-color 0.35s ease;
+    cursor: default;
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .tech-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.55s ease, transform 0.55s cubic-bezier(.22,1,.36,1),
+                box-shadow 0.35s cubic-bezier(.22,1,.36,1),
+                border-color 0.35s ease;
+  }
+  .tech-card:hover {
+    transform: translateY(-6px) scale(1.04);
+  }
+
+  /* Per-card glow theming */
+  .tech-card[data-tech="python"]:hover  { box-shadow: 0 12px 40px rgba(55,118,171,0.35), 0 0 0 1px rgba(55,118,171,0.4); border-color: rgba(55,118,171,0.45); }
+  .tech-card[data-tech="flask"]:hover   { box-shadow: 0 12px 40px rgba(200,200,200,0.2), 0 0 0 1px rgba(200,200,200,0.25); border-color: rgba(200,200,200,0.3); }
+  .tech-card[data-tech="webstack"]:hover{ box-shadow: 0 12px 40px rgba(228,77,38,0.3), 0 0 0 1px rgba(228,77,38,0.4); border-color: rgba(228,77,38,0.4); }
+  .tech-card[data-tech="openweather"]:hover { box-shadow: 0 12px 40px rgba(0,200,220,0.3), 0 0 0 1px rgba(0,200,220,0.4); border-color: rgba(0,200,220,0.4); }
+  .tech-card[data-tech="waqi"]:hover    { box-shadow: 0 12px 40px rgba(0,210,170,0.3), 0 0 0 1px rgba(0,210,170,0.4); border-color: rgba(0,210,170,0.4); }
+
+  .tech-icon-wrap {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    transition: transform 0.35s cubic-bezier(.22,1,.36,1), filter 0.35s ease;
+  }
+  .tech-card:hover .tech-icon-wrap { transform: scale(1.08); }
+
+  .tech-card[data-tech="python"] .tech-icon-wrap  { background: rgba(55,118,171,0.12); }
+  .tech-card[data-tech="flask"] .tech-icon-wrap    { background: rgba(200,200,200,0.08); }
+  .tech-card[data-tech="webstack"] .tech-icon-wrap { background: rgba(228,77,38,0.1); }
+  .tech-card[data-tech="openweather"] .tech-icon-wrap { background: rgba(0,200,220,0.1); }
+  .tech-card[data-tech="waqi"] .tech-icon-wrap    { background: rgba(0,210,170,0.1); }
+
+  .tech-card[data-tech="python"]:hover .tech-icon-wrap  { filter: drop-shadow(0 0 12px rgba(55,118,171,0.7)); }
+  .tech-card[data-tech="flask"]:hover .tech-icon-wrap   { filter: drop-shadow(0 0 12px rgba(200,200,200,0.5)); }
+  .tech-card[data-tech="webstack"]:hover .tech-icon-wrap{ filter: drop-shadow(0 0 12px rgba(228,77,38,0.65)); }
+  .tech-card[data-tech="openweather"]:hover .tech-icon-wrap { filter: drop-shadow(0 0 12px rgba(0,200,220,0.7)); }
+  .tech-card[data-tech="waqi"]:hover .tech-icon-wrap    { filter: drop-shadow(0 0 12px rgba(0,210,170,0.7)); }
+
+  .tech-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(228,229,238,0.75);
+    text-align: center;
+    line-height: 1.4;
+    transition: color 0.3s ease;
+  }
+  .tech-card[data-tech="python"]:hover  .tech-label { color: #6fa8d6; }
+  .tech-card[data-tech="flask"]:hover   .tech-label { color: #e4e5ee; }
+  .tech-card[data-tech="webstack"]:hover .tech-label { color: #ff7c5c; }
+  .tech-card[data-tech="openweather"]:hover .tech-label { color: #00cfe8; }
+  .tech-card[data-tech="waqi"]:hover    .tech-label { color: #00d2aa; }
+
+  /* Gradient border shimmer on hover */
+  .tech-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    transition: background 0.35s ease;
+    pointer-events: none;
+  }
+  .tech-card[data-tech="python"]:hover::before  { background: linear-gradient(135deg, rgba(55,118,171,0.6), rgba(255,212,59,0.4)); }
+  .tech-card[data-tech="flask"]:hover::before   { background: linear-gradient(135deg, rgba(200,200,200,0.4), rgba(100,100,100,0.2)); }
+  .tech-card[data-tech="webstack"]:hover::before{ background: linear-gradient(135deg, rgba(228,77,38,0.6), rgba(255,212,0,0.4)); }
+  .tech-card[data-tech="openweather"]:hover::before { background: linear-gradient(135deg, rgba(0,200,220,0.6), rgba(0,100,200,0.4)); }
+  .tech-card[data-tech="waqi"]:hover::before    { background: linear-gradient(135deg, rgba(0,210,170,0.6), rgba(0,150,200,0.4)); }
+</style>
+
+<section id="tech-stack-section" class="py-28 px-8">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant mb-5">
+        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block"></span>
+        Powered By
+      </div>
+      <h2 class="tech-section-title text-4xl md:text-5xl font-headline font-bold mb-3">Technology Stack</h2>
+      <p class="text-on-surface-variant text-base max-w-md mx-auto">The precision engine behind the intelligence.</p>
+    </div>
+
+    <div class="tech-grid" id="tech-grid">
+
+      <!-- Python -->
+      <div class="tech-card" data-tech="python" data-delay="0">
+        <div class="tech-icon-wrap">
+          <svg width="40" height="40" viewBox="0 0 256 255" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="py-blue" x1="12%" y1="12%" x2="88%" y2="88%">
+                <stop offset="0%" stop-color="#5A9FD4"/>
+                <stop offset="100%" stop-color="#306998"/>
+              </linearGradient>
+              <linearGradient id="py-yellow" x1="12%" y1="12%" x2="88%" y2="88%">
+                <stop offset="0%" stop-color="#FFD43B"/>
+                <stop offset="100%" stop-color="#FFE873"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#py-blue)" d="M126.9 0C62.2 0 65.8 27.8 65.8 27.8l.1 28.8h62.4v8.6H41.3S0 60.5 0 126c0 65.4 36.2 63.1 36.2 63.1h21.6v-30.4s-1.2-36.2 35.6-36.2h61.3s34.5.6 34.5-33.3V35.1C189.2 2.6 153.7 0 126.9 0zm-34.3 19.7c6.2 0 11.2 5 11.2 11.2s-5 11.2-11.2 11.2-11.2-5-11.2-11.2 5-11.2 11.2-11.2z"/>
+            <path fill="url(#py-yellow)" d="M129.1 255c64.8 0 61.1-27.8 61.1-27.8l-.1-28.8h-62.4v-8.6h87s41.3 4.7 41.3-61.6c0-66.4-36.2-63.1-36.2-63.1h-21.6v30.3s1.2 36.2-35.6 36.2H101.3S66.8 121 66.8 154.9V220c0 32.4 35.5 35 62.3 35zm34.3-19.7c-6.2 0-11.2-5-11.2-11.2s5-11.2 11.2-11.2 11.2 5 11.2 11.2-5 11.2-11.2 11.2z"/>
+          </svg>
+        </div>
+        <span class="tech-label">Python</span>
+      </div>
+
+      <!-- Flask -->
+      <div class="tech-card" data-tech="flask" data-delay="1">
+        <div class="tech-icon-wrap">
+          <svg width="38" height="38" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+            <path fill="rgba(228,229,238,0.9)" d="M39.4 100.5c-2.5 1.4-3 5.3-.9 7.3 1.8 1.7 4.8 1.4 6.5-.5 1.8-2 1.5-5.4-.7-6.9-1.6-1.1-3.5-1-4.9.1zm-3.2-20.2c-4.2 2.4-5.1 8.5-1.7 12 3.2 3.3 9.2 2.8 11.8-.9 2.4-3.5 1.1-8.7-2.7-10.8-2.9-1.6-5.5-1.4-7.4.2zM64 8C33.6 8 9 32.6 9 63c0 15.9 6.5 30.3 17.1 40.7C33 110.3 43 114 64 114c20.6 0 31-3.7 37.9-10.3C113 93.3 119 79 119 63 119 32.6 94.4 8 64 8zm-7 91.5c-1 4.4-4.8 7-9.2 6.1-4.4-1-6.9-5-5.9-9.4 1-4.5 4.8-7 9.2-6 4.5 1 7 4.9 5.9 9.3zm13.5-18.6c-2.2 10.2-11.5 16.1-21.6 13.9C39 92.7 33.2 83.3 35.4 73c2.3-10.3 11.5-16.1 21.7-13.8 10.4 2.2 16.1 11.5 13.4 21.7zM91 47.9c-1 .3-2 .4-3 .2-2.8-.5-4.7-2.9-4.2-5.7.5-2.8 3.1-4.7 5.9-4.2 2.8.5 4.7 2.9 4.2 5.7-.3 1.6-1.4 3-2.9 4zm-9.7 29.3C77.1 90 65.8 97.4 53.7 95c-7.3-1.6-12.7-6.3-15.3-12.8 2.1 2.4 5 4.2 8.5 4.9 8.7 1.9 17.3-3.3 19.4-11.7 1.1-4.4.2-8.8-2.2-12.1C74.2 62 83 70.4 81.3 77.2z"/>
+          </svg>
+        </div>
+        <span class="tech-label">Flask</span>
+      </div>
+
+      <!-- HTML, CSS, JS -->
+      <div class="tech-card" data-tech="webstack" data-delay="2">
+        <div class="tech-icon-wrap">
+          <svg width="44" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg">
+            <!-- HTML5 -->
+            <g transform="translate(0,1)">
+              <path fill="#E44D26" d="M2 0l2.5 28L14 36l9.5-8L26 0z"/>
+              <path fill="#F16529" d="M14 3.5v28.8l7.7-6.6L23.8 3.5z"/>
+              <path fill="#EBEBEB" d="M14 14.5H8.5l-.4-4.5H14V5.5H3l1.2 14H14zm0 9.8l-.1.1-3.8-1-.2-2.9H5.7l.5 5.5 7.7 2.1z"/>
+              <path fill="#fff" d="M14 14.5v4.5h5l-.5 5.3-4.5 1.2v4.8l7.7-2.1 1.1-12.7z"/>
+            </g>
+            <!-- CSS3 -->
+            <g transform="translate(46,1)">
+              <path fill="#1572B6" d="M2 0l2.5 28L14 36l9.5-8L26 0z"/>
+              <path fill="#33A9DC" d="M14 3.5v28.8l7.7-6.6L23.8 3.5z"/>
+              <path fill="#fff" d="M14 14.5H8.3l.4 4.5H14V23h-4.7l.4 2.9 4.3 1.2v4.7l-7.7-2.1-1-11.2H2.9L4.2 5.5H14zM14 14.5v4.5h4.7L18.3 23l-4.3 1.2v4.8l7.7-2.1.8-12.4z"/>
+            </g>
+            <!-- JS -->
+            <g transform="translate(93,1)">
+              <rect width="26" height="36" rx="1" fill="#F7DF1E"/>
+              <path fill="#323330" d="M19.5 27.5c.5 1.8 2 3 4 3 1.7 0 2.8-.8 2.8-2 0-1.4-1.2-1.9-3-2.6l-1-.4c-3-1.2-5-2.8-5-6 0-3 2.2-5.3 5.7-5.3 2.5 0 4.2 1 5.5 3.4l-3 2c-.6-1.2-1.3-1.7-2.5-1.7-1.1 0-1.8.7-1.8 1.7 0 1.2.7 1.7 2.3 2.3l1 .4c3.5 1.5 5.5 3 5.5 6.3 0 3.6-2.8 5.6-6.5 5.6-3.7 0-6-1.9-7.2-4.4zm-11 .6c.4 1.4 1 2.6 2.7 2.6 1.4 0 2.2-.5 2.2-2.5V14.5h4V28.3c0 4.2-2.5 6-6 6-3.3 0-5.2-1.7-6.2-3.8z"/>
+            </g>
+          </svg>
+        </div>
+        <span class="tech-label">HTML, CSS, JS</span>
+      </div>
+
+      <!-- OpenWeather API -->
+      <div class="tech-card" data-tech="openweather" data-delay="3">
+        <div class="tech-icon-wrap">
+          <svg width="44" height="44" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="sun-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFD43B"/>
+                <stop offset="100%" stop-color="#FFA500"/>
+              </linearGradient>
+              <linearGradient id="cloud-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00CFE8"/>
+                <stop offset="100%" stop-color="#0084B4"/>
+              </linearGradient>
+            </defs>
+            <!-- Sun rays -->
+            <g stroke="url(#sun-grad)" stroke-width="2.5" stroke-linecap="round" opacity="0.9">
+              <line x1="20" y1="7"  x2="20" y2="2"/>
+              <line x1="20" y1="23" x2="20" y2="28"/>
+              <line x1="13" y1="10" x2="9"  y2="6"/>
+              <line x1="27" y1="10" x2="31" y2="6"/>
+              <line x1="10" y1="15" x2="5"  y2="15"/>
+              <line x1="30" y1="15" x2="35" y2="15"/>
+            </g>
+            <!-- Sun body -->
+            <circle cx="20" cy="15" r="7" fill="url(#sun-grad)" opacity="0.9"/>
+            <!-- Cloud -->
+            <path d="M52 38a9 9 0 00-9-9c-.4 0-.7 0-1 .05A12 12 0 0018 34a7 7 0 000 14h34a7 7 0 000-14z" fill="url(#cloud-grad)"/>
+            <!-- Rain drops -->
+            <g fill="url(#cloud-grad)" opacity="0.7">
+              <ellipse cx="28" cy="54" rx="2" ry="3"/>
+              <ellipse cx="38" cy="57" rx="2" ry="3"/>
+              <ellipse cx="48" cy="54" rx="2" ry="3"/>
+            </g>
+          </svg>
+        </div>
+        <span class="tech-label">OpenWeather API</span>
+      </div>
+
+      <!-- WAQI API -->
+      <div class="tech-card" data-tech="waqi" data-delay="4">
+        <div class="tech-icon-wrap">
+          <svg width="44" height="44" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="aqi-grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#00D2AA"/>
+                <stop offset="100%" stop-color="#00CFE8"/>
+              </linearGradient>
+            </defs>
+            <!-- Air/pollution wave stripes -->
+            <g stroke="url(#aqi-grad1)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95">
+              <path d="M8 20 Q20 14 32 20 Q44 26 56 20"/>
+              <path d="M8 30 Q20 24 32 30 Q44 36 56 30"/>
+              <path d="M8 40 Q20 34 32 40 Q44 46 56 40"/>
+            </g>
+            <!-- Central AQI indicator circle -->
+            <circle cx="32" cy="30" r="11" fill="rgba(0,210,170,0.12)" stroke="url(#aqi-grad1)" stroke-width="2"/>
+            <!-- Tiny pollution particle dots -->
+            <circle cx="16" cy="16" r="3" fill="#00D2AA" opacity="0.6"/>
+            <circle cx="48" cy="18" r="2.5" fill="#00CFE8" opacity="0.5"/>
+            <circle cx="14" cy="46" r="2" fill="#00D2AA" opacity="0.4"/>
+            <circle cx="50" cy="44" r="3" fill="#00CFE8" opacity="0.5"/>
+          </svg>
+        </div>
+        <span class="tech-label">WAQI API</span>
+      </div>
+
+    </div><!-- /tech-grid -->
+  </div>
 </section>
+
+<script>
+(function() {
+  const cards = document.querySelectorAll('#tech-grid .tech-card');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const card = entry.target;
+        const delay = parseInt(card.dataset.delay || 0) * 90;
+        setTimeout(() => card.classList.add('visible'), delay);
+        observer.unobserve(card);
+      }
+    });
+  }, { threshold: 0.15 });
+  cards.forEach(c => observer.observe(c));
+})();
+</script>
 <section class="py-24 px-8 max-w-7xl mx-auto">
 <h2 class="text-3xl md:text-5xl font-headline font-bold text-center mb-16">Use Cases</h2>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
