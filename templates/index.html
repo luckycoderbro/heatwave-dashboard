@@ -85,55 +85,130 @@
         }
       </script>
 <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0b0e14; color: #e4e5ee; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #05070a; 
+            color: #e4e5ee; 
+            overflow-x: hidden;
+        }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .thermal-gradient { background: radial-gradient(circle at 50% 50%, rgba(255, 144, 109, 0.05) 0%, rgba(11, 14, 20, 0) 70%); }
-        .glass-panel { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        
+        /* ── DYNAMIC BACKGROUND ── */
+        .bg-blobs {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #0a0d14 0%, #05070a 100%);
         }
-        .animate-fade-up { animation: fadeUp 0.8s ease-out forwards; }
-        #map { height: 100%; width: 100%; }
+        .blob {
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--blob-color) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.1); }
+        }
+
+        /* ── GLASSMORPHISM & 3D ── */
+        .glass-card {
+            background: rgba(22, 26, 33, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 4px 24px -1px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255, 144, 109, 0.3);
+            box-shadow: 
+                0 20px 40px -10px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(255, 144, 109, 0.1);
+        }
+
+        /* ── BUTTONS ── */
+        .btn-premium {
+            background: linear-gradient(135deg, #ff906d 0%, #ff5d26 100%);
+            color: #000;
+            box-shadow: 
+                0 10px 20px -5px rgba(255, 93, 38, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 15px 30px -5px rgba(255, 93, 38, 0.5);
+            filter: brightness(1.1);
+        }
+        .btn-premium:active { transform: scale(0.96); }
+
+        .btn-secondary-3d {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary-3d:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* ── HERO ── */
+        .hero-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%; height: 80%;
+            background: radial-gradient(circle, rgba(255, 144, 109, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #ff906d 0%, #feb300 50%, #ff716c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── MISC ── */
+        .parallax-element {
+            transition: transform 0.1s ease-out;
+        }
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #map { height: 100%; width: 100%; border-radius: 2rem; }
         .leaflet-container { 
-            background: #0b0e14 !important;
+            background: #05070a !important;
             font-family: 'Inter', sans-serif !important;
-        }
-        .leaflet-tile-layer { 
-            filter: contrast(1.1) brightness(0.9) saturate(0.8);
-        }
-        .leaflet-popup-content-wrapper, .leaflet-popup-tip { 
-            background: transparent !important; 
-            color: #e4e5ee !important; 
-            box-shadow: none !important;
-            padding: 0 !important;
-        }
-        .leaflet-popup-content { margin: 0 !important; }
-        .marker-glow { 
-            filter: drop-shadow(0 0 10px currentColor);
-            animation: pulse-marker 2s infinite ease-in-out;
-        }
-        @keyframes pulse-marker {
-            0% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.15); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.9; }
         }
         .map-vignette {
             pointer-events: none;
-            background: radial-gradient(circle, transparent 40%, rgba(11, 14, 20, 0.45) 100%);
+            background: radial-gradient(circle, transparent 40%, rgba(5, 7, 10, 0.6) 100%);
             z-index: 1000;
-        }
-        .map-cinematic-gradient {
-            pointer-events: none;
-            background: linear-gradient(180deg, rgba(11, 14, 20, 0.8) 0%, transparent 15%, transparent 85%, rgba(11, 14, 20, 0.8) 100%);
-            z-index: 1000;
-        }
-        .leaflet-bar {
-            border: none !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
         }
         .leaflet-bar a {
-            background-color: #1c2028 !important;
+            background-color: #1c2028/80 !important;
+            backdrop-filter: blur(8px);
             color: #ff906d !important;
             border: 1px solid rgba(255, 144, 109, 0.2) !important;
             border-radius: 12px !important;
@@ -151,7 +226,13 @@
     </style>
 </head>
 <body class="antialiased selection:bg-primary selection:text-on-primary-fixed">
-<nav class="fixed top-0 w-full z-50 bg-[#0b0e14]/60 backdrop-blur-xl">
+    <!-- BACKGROUND BLOBS -->
+    <div class="bg-blobs">
+        <div class="blob" style="--blob-color: #ff906d; top: -10%; left: -10%; animation-delay: 0s;"></div>
+        <div class="blob" style="--blob-color: #7e5700; top: 40%; right: -10%; animation-delay: -5s; width: 400px; height: 400px;"></div>
+        <div class="blob" style="--blob-color: #5b1600; bottom: -10%; left: 20%; animation-delay: -10s;"></div>
+    </div>
+<nav class="fixed top-0 w-full z-50 bg-[#05070a]/40 backdrop-blur-2xl border-b border-white/5">
 <div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
 <div class="text-xl font-bold tracking-tighter text-[#e4e5ee] font-['Plus_Jakarta_Sans']">ClimaRisk</div>
 <div class="hidden md:flex gap-8 items-center">
@@ -161,47 +242,47 @@
 <a class="text-[#e4e5ee]/70 hover:text-[#ff906d] text-sm transition-colors duration-300" href="#">Use cases</a>
 <a class="text-[#e4e5ee]/70 hover:text-[#ff906d] text-sm transition-colors duration-300" href="#">About</a>
 </div>
-<button id="nav-check-btn" class="bg-primary hover:bg-primary-container text-on-primary-fixed px-5 py-2 rounded-full font-semibold text-sm transition-all duration-300 scale-95 active:scale-90">
+<button id="nav-check-btn" class="btn-premium px-6 py-2.5 rounded-full font-bold text-sm">
                 Check Risk
             </button>
 </div>
 </nav>
 <main class="pt-24">
-<section class="relative min-h-[870px] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
-<div class="absolute inset-0 thermal-gradient pointer-events-none"></div>
-<div class="relative z-10 max-w-4xl">
-<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-medium mb-6 uppercase tracking-widest">
+<section class="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
+<div class="hero-glow"></div>
+<div class="relative z-10 max-w-4xl parallax-element" data-parallax-speed="0.05">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-[10px] font-bold mb-8 uppercase tracking-[0.2em] animate-fade-up">
 <span class="relative flex h-2 w-2">
 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
 <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
 </span>
-                    AI-Powered Heatwave Risk Monitoring System
+                    Next-Gen Climate Intelligence
                 </div>
-<h1 class="font-headline text-5xl md:text-7xl font-extrabold tracking-tight text-on-background mb-6 leading-[1.1]">
-                    Intelligence for a <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Warming World.</span>
+<h1 class="font-headline text-5xl md:text-8xl font-extrabold tracking-tight text-white mb-8 leading-[1.05] animate-fade-up" style="animation-delay: 0.1s">
+                    Intelligence for a <span class="gradient-text">Warming World.</span>
 </h1>
-<p class="text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto mb-10 font-body leading-relaxed">
-                    Real-time environmental analysis for smarter climate awareness. Harness ML to predict and mitigate hyper-local thermal risks.
+<p class="text-on-surface-variant text-lg md:text-2xl max-w-2xl mx-auto mb-12 font-body leading-relaxed animate-fade-up" style="animation-delay: 0.2s">
+                    Real-time environmental analysis for smarter climate awareness. Harness ML to predict and mitigate thermal risks.
                 </p>
-<div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-<button id="hero-check-btn" class="w-full sm:w-auto bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-8 py-4 rounded-full font-bold text-lg shadow-[0_20px_50px_rgba(255,144,109,0.2)] transition-transform hover:scale-105 active:scale-95">
+<div class="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-up" style="animation-delay: 0.3s">
+<button id="hero-check-btn" class="btn-premium w-full sm:w-auto px-10 py-5 rounded-full font-black text-lg">
                         Check Risk Now
                     </button>
-<button id="view-map-btn" class="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-lg text-primary border border-outline-variant/30 hover:bg-surface-container transition-colors">
+<button id="view-map-btn" class="btn-secondary-3d w-full sm:w-auto px-10 py-5 rounded-full font-black text-lg">
                         View Global Map
                     </button>
 </div>
 </div>
-<div id="city-input-section" class="mt-20 w-full max-w-5xl mx-auto px-4">
-<div class="bg-surface-container-low rounded-3xl p-2 border border-outline-variant/10 shadow-2xl">
-<div class="flex flex-col md:flex-row items-center gap-2">
+<div id="city-input-section" class="mt-24 w-full max-w-4xl mx-auto px-4 animate-fade-up" style="animation-delay: 0.4s">
+<div class="glass-card rounded-[2.5rem] p-3 border border-white/10 shadow-3xl">
+<div class="flex flex-col md:flex-row items-center gap-3">
 <div class="relative flex-grow w-full">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">location_on</span>
-<input id="city-input" class="w-full bg-surface-container-lowest border-none rounded-2xl py-4 pl-12 pr-4 focus:ring-1 focus:ring-primary text-on-surface placeholder:text-on-surface-variant/50" placeholder="Enter city and press Enter" type="text"/>
+<span class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-primary">location_on</span>
+<input id="city-input" class="w-full bg-white/5 border-none rounded-[1.8rem] py-5 pl-14 pr-6 focus:ring-2 focus:ring-primary/50 text-white placeholder:text-white/30 transition-all font-medium" placeholder="Enter city (e.g. Mumbai, Delhi, Jaipur)" type="text"/>
 </div>
-<button id="analyze-btn" class="w-full md:w-auto bg-primary text-on-primary-fixed px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 whitespace-nowrap transition-all hover:brightness-110">
+<button id="analyze-btn" class="btn-premium w-full md:w-auto px-10 py-5 rounded-[1.8rem] font-black flex items-center justify-center gap-3 whitespace-nowrap">
 <span class="material-symbols-outlined">analytics</span>
-                            Check Risk
+                            Analyze Risk
                         </button>
 </div>
 </div>
@@ -220,65 +301,69 @@
     <p class="text-xl font-headline font-bold text-on-surface-variant animate-pulse">Analyzing heatwave risk...</p>
 </div>
 
-<div id="results-grid" class="grid grid-cols-1 lg:grid-cols-5 gap-6 transition-opacity duration-500 opacity-100">
-<div class="md:col-span-1 bg-surface-container rounded-3xl p-8 flex flex-col justify-between group hover:bg-surface-bright transition-colors">
+<div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 transition-all duration-700 opacity-100">
+<div class="glass-card rounded-[2rem] p-8 flex flex-col justify-between parallax-element" data-parallax-speed="0.02">
 <div>
-<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6">
-<span class="material-symbols-outlined">device_thermostat</span>
+<div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 shadow-inner">
+<span class="material-symbols-outlined text-3xl">device_thermostat</span>
 </div>
-<h3 class="text-on-surface-variant text-sm font-medium uppercase tracking-widest mb-1">Temperature</h3>
-<div class="text-4xl font-headline font-bold text-on-background"><span id="val-temp">--</span><span class="text-primary text-2xl ml-1">°C</span></div>
+<h3 class="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Temperature</h3>
+<div class="text-5xl font-headline font-black text-white"><span id="val-temp">--</span><span class="text-primary text-2xl ml-1">°C</span></div>
 </div>
-<div class="mt-8 text-xs text-on-surface-variant/60 flex items-center gap-1">
-<span class="material-symbols-outlined text-sm">trending_up</span> 2.1° above average
+<div class="mt-10 text-[10px] font-bold text-white/30 flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">trending_up</span> Real-time sensor feed
                     </div>
 </div>
-<div class="md:col-span-1 bg-surface-container rounded-3xl p-8 flex flex-col justify-between hover:bg-surface-bright transition-colors">
+
+<div class="glass-card rounded-[2rem] p-8 flex flex-col justify-between parallax-element" data-parallax-speed="0.03">
 <div>
-<div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary mb-6">
-<span class="material-symbols-outlined">humidity_percentage</span>
+<div class="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary mb-8 shadow-inner">
+<span class="material-symbols-outlined text-3xl">humidity_percentage</span>
 </div>
-<h3 class="text-on-surface-variant text-sm font-medium uppercase tracking-widest mb-1">Humidity</h3>
-<div class="text-4xl font-headline font-bold text-on-background"><span id="val-humidity">--</span><span class="text-secondary text-2xl ml-1">%</span></div>
+<h3 class="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Humidity</h3>
+<div class="text-5xl font-headline font-black text-white"><span id="val-humidity">--</span><span class="text-secondary text-2xl ml-1">%</span></div>
 </div>
-<div class="mt-8 text-xs text-on-surface-variant/60 flex items-center gap-1">
-<span class="material-symbols-outlined text-sm">water_drop</span> Moderate moisture
+<div class="mt-10 text-[10px] font-bold text-white/30 flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">water_drop</span> Atmospheric moisture
                     </div>
 </div>
-<div class="md:col-span-1 bg-surface-container rounded-3xl p-8 flex flex-col justify-between hover:bg-surface-bright transition-colors">
+
+<div class="glass-card rounded-[2rem] p-8 flex flex-col justify-between parallax-element" data-parallax-speed="0.04">
 <div>
-<div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary mb-6">
-<span class="material-symbols-outlined">air</span>
+<div class="w-14 h-14 rounded-2xl bg-tertiary/10 flex items-center justify-center text-tertiary mb-8 shadow-inner">
+<span class="material-symbols-outlined text-3xl">air</span>
 </div>
-<h3 class="text-on-surface-variant text-sm font-medium uppercase tracking-widest mb-1">AQI</h3>
-<div class="text-4xl font-headline font-bold text-on-background" id="val-aqi">--</div>
+<h3 class="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-2">AQI Score</h3>
+<div class="text-5xl font-headline font-black text-white" id="val-aqi">--</div>
 </div>
-<div class="mt-8 text-xs text-on-surface-variant/60 flex items-center gap-1">
-<span class="material-symbols-outlined text-sm text-tertiary">check_circle</span> Good Quality
+<div class="mt-10 text-[10px] font-bold text-white/30 flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm text-tertiary">check_circle</span> Air Quality Index
                     </div>
 </div>
-<div class="md:col-span-1 bg-surface-container rounded-3xl p-8 flex flex-col justify-between hover:bg-surface-bright transition-colors">
+
+<div class="glass-card rounded-[2rem] p-8 flex flex-col justify-between parallax-element" data-parallax-speed="0.05">
 <div>
-<div class="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center text-error mb-6">
-<span class="material-symbols-outlined">thermostat</span>
+<div class="w-14 h-14 rounded-2xl bg-error/10 flex items-center justify-center text-error mb-8 shadow-inner">
+<span class="material-symbols-outlined text-3xl">thermostat</span>
 </div>
-<h3 class="text-on-surface-variant text-sm font-medium uppercase tracking-widest mb-1">Heat Index</h3>
-<div class="text-4xl font-headline font-bold text-on-background" id="val-hi">--</div>
+<h3 class="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Heat Index</h3>
+<div class="text-5xl font-headline font-black text-white" id="val-hi">--</div>
 </div>
-<div class="mt-8 text-xs text-on-surface-variant/60 flex items-center gap-1">
-<span class="material-symbols-outlined text-sm text-error">warning</span> Derived Exposure
+<div class="mt-10 text-[10px] font-bold text-white/30 flex items-center gap-2 uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm text-error">warning</span> Feels-like impact
                     </div>
 </div>
-<div class="md:col-span-1 bg-surface-container-high rounded-3xl p-8 border border-primary/20 flex flex-col items-center justify-center text-center">
-<h3 class="text-on-surface-variant text-sm font-medium uppercase tracking-widest mb-4">Risk Score</h3>
-<div class="relative w-32 h-32 flex items-center justify-center mb-4">
+
+<div class="glass-card rounded-[2rem] p-8 border-primary/20 flex flex-col items-center justify-center text-center parallax-element" data-parallax-speed="0.06">
+<h3 class="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-6">Total Risk Score</h3>
+<div class="relative w-40 h-40 flex items-center justify-center mb-6">
 <svg class="absolute inset-0 w-full h-full transform -rotate-90">
-<circle class="text-surface-container-lowest" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
-<circle class="text-primary" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="100" stroke-width="8"></circle>
+<circle class="text-white/5" cx="80" cy="80" fill="transparent" r="74" stroke="currentColor" stroke-width="10"></circle>
+<circle class="text-primary" id="risk-circle" cx="80" cy="80" fill="transparent" r="74" stroke="currentColor" stroke-dasharray="465" stroke-dashoffset="465" stroke-width="12" stroke-linecap="round" style="transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);"></circle>
 </svg>
-<span class="text-4xl font-headline font-bold text-on-background" id="val-risk">--</span>
+<span class="text-5xl font-headline font-black text-white" id="val-risk">--</span>
 </div>
-<span id="val-risk-text" class="px-4 py-1 rounded-full bg-gradient-to-r from-error to-error-container text-on-primary-fixed text-xs font-bold uppercase tracking-wider">Ready</span>
+<span id="val-risk-text" class="px-6 py-2 rounded-full bg-white/5 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] shadow-inner border border-white/5">Calculated Tier</span>
 </div>
 </div>
 </section>
@@ -290,38 +375,37 @@
 <p class="text-on-surface-variant max-w-2xl mx-auto">Understanding the key environmental and urban parameters that drive heatwave vulnerability.</p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-16 animate-fade-up" style="animation-delay: 0.2s;">
-<div class="bg-surface-container p-8 rounded-3xl border border-outline-variant/10 hover:-translate-y-2 transition-all hover:bg-surface-bright group hover:shadow-[0_10px_30px_rgba(255,144,109,0.1)]">
-<h3 class="text-xl font-bold mb-3 flex items-center gap-2 group-hover:text-primary transition-colors">🌡️ Temperature</h3>
-<p class="text-sm font-semibold text-on-surface-variant mb-3 border-b border-outline-variant/10 pb-3">Measures the ambient air temperature in degrees Celsius</p>
-<p class="text-sm text-on-surface-variant leading-relaxed"><span class="text-primary font-bold">Impact:</span> Higher temperatures directly increase heatwave intensity and stress on the human body</p>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-16 animate-on-scroll">
+<div class="glass-card p-10 rounded-[2.5rem] group hover:shadow-[0_20px_60px_rgba(255,144,109,0.15)]">
+<h3 class="text-2xl font-black mb-4 flex items-center gap-3 group-hover:text-primary transition-colors">🌡️ Temperature</h3>
+<p class="text-xs font-bold text-white/30 mb-5 uppercase tracking-widest border-b border-white/5 pb-5">Ambient air measurement</p>
+<p class="text-white/60 leading-relaxed font-medium"><span class="text-primary font-black">Impact:</span> Higher temperatures directly increase heatwave intensity and physiological stress.</p>
 </div>
 
-<div class="bg-surface-container p-8 rounded-3xl border border-outline-variant/10 hover:-translate-y-2 transition-all hover:bg-surface-bright group hover:shadow-[0_10px_30px_rgba(254,179,0,0.1)]">
-<h3 class="text-xl font-bold mb-3 flex items-center gap-2 group-hover:text-secondary transition-colors">💧 Humidity</h3>
-<p class="text-sm font-semibold text-on-surface-variant mb-3 border-b border-outline-variant/10 pb-3">Represents the amount of moisture in the air</p>
-<p class="text-sm text-on-surface-variant leading-relaxed"><span class="text-secondary font-bold">Impact:</span> High humidity reduces the body’s ability to cool itself, increasing perceived heat (heat index)</p>
+<div class="glass-card p-10 rounded-[2.5rem] group hover:shadow-[0_20px_60px_rgba(254,179,0,0.15)]">
+<h3 class="text-2xl font-black mb-4 flex items-center gap-3 group-hover:text-secondary transition-colors">💧 Humidity</h3>
+<p class="text-xs font-bold text-white/30 mb-5 uppercase tracking-widest border-b border-white/5 pb-5">Atmospheric moisture content</p>
+<p class="text-white/60 leading-relaxed font-medium"><span class="text-secondary font-black">Impact:</span> High humidity inhibits evaporative cooling, elevating the perceived heat intensity.</p>
 </div>
 
-<div class="bg-surface-container p-8 rounded-3xl border border-outline-variant/10 hover:-translate-y-2 transition-all hover:bg-surface-bright group hover:shadow-[0_10px_30px_rgba(187,255,179,0.1)]">
-<h3 class="text-xl font-bold mb-3 flex items-center gap-2 group-hover:text-tertiary transition-colors">🌫️ AQI (Air Quality Index)</h3>
-<p class="text-sm font-semibold text-on-surface-variant mb-3 border-b border-outline-variant/10 pb-3">Indicates the level of air pollution</p>
-<p class="text-sm text-on-surface-variant leading-relaxed"><span class="text-tertiary font-bold">Impact:</span> Poor air quality worsens respiratory stress and increases vulnerability during heatwaves</p>
+<div class="glass-card p-10 rounded-[2.5rem] group hover:shadow-[0_20px_60px_rgba(187,255,179,0.15)]">
+<h3 class="text-2xl font-black mb-4 flex items-center gap-3 group-hover:text-tertiary transition-colors">🌫️ AQI Exposure</h3>
+<p class="text-xs font-bold text-white/30 mb-5 uppercase tracking-widest border-b border-white/5 pb-5">Air Quality Index level</p>
+<p class="text-white/60 leading-relaxed font-medium"><span class="text-tertiary font-black">Impact:</span> Poor air quality compounds respiratory stress during extreme heat events.</p>
 </div>
 
-<div class="bg-surface-container p-8 rounded-3xl border border-outline-variant/10 hover:-translate-y-2 transition-all hover:bg-surface-bright group hover:shadow-[0_10px_30px_rgba(255,113,108,0.1)]">
-<h3 class="text-xl font-bold mb-3 flex items-center gap-2 group-hover:text-error transition-colors">🏙️ Density</h3>
-<p class="text-sm font-semibold text-on-surface-variant mb-3 border-b border-outline-variant/10 pb-3">Number of people per square kilometer</p>
-<p class="text-sm text-on-surface-variant leading-relaxed"><span class="text-error font-bold">Impact:</span> Higher density increases exposure and amplifies urban heat island effects</p>
+<div class="glass-card p-10 rounded-[2.5rem] group hover:shadow-[0_20px_60px_rgba(255,113,108,0.15)]">
+<h3 class="text-2xl font-black mb-4 flex items-center gap-3 group-hover:text-error transition-colors">🏙️ Urban Density</h3>
+<p class="text-xs font-bold text-white/30 mb-5 uppercase tracking-widest border-b border-white/5 pb-5">Population per square km</p>
+<p class="text-white/60 leading-relaxed font-medium"><span class="text-error font-black">Impact:</span> Dense urban grids amplify heat absorption, creating local heat island effects.</p>
+</div>
 </div>
 
-</div>
-
-<div id="live-calculation" class="max-w-4xl mx-auto bg-surface-container-high rounded-[2.5rem] p-10 border border-primary/20 shadow-xl relative overflow-hidden group hover:border-primary/40 transition-colors animate-fade-up" style="animation-delay: 0.4s;">
-<div class="absolute inset-0 thermal-gradient opacity-30 pointer-events-none transition-opacity group-hover:opacity-50"></div>
+<div id="live-calculation" class="max-w-4xl mx-auto glass-card rounded-[3rem] p-12 shadow-3xl relative overflow-hidden group animate-on-scroll">
+<div class="hero-glow opacity-20 group-hover:opacity-40 transition-opacity"></div>
 <div class="relative z-10">
-<h3 class="text-3xl font-headline font-bold mb-4 text-center">Live Heatwave Risk Calculation</h3>
-<p class="text-center text-on-surface-variant mb-10">A completely transparent breakdown of exactly how your current risk score is derived from the live data.</p>
+<h3 class="text-4xl font-headline font-black mb-4 text-center">Transparent Intelligence</h3>
+<p class="text-center text-white/50 mb-12 font-medium">Experience the precision logic behind every risk classification.</p>
 
 <!-- Step 1: Heat Index Breakdown -->
 <div class="mb-8">
@@ -805,32 +889,30 @@
 </div>
 </footer>
 <!-- MAP OVERLAY -->
-<div id="map-overlay" class="fixed inset-0 z-[100] bg-background/95 backdrop-blur-md hidden opacity-0 transition-opacity duration-500 overflow-hidden flex items-center justify-center p-6">
-    <div class="absolute inset-0 map-cinematic-gradient pointer-events-none"></div>
-    <div class="absolute inset-0 map-vignette pointer-events-none"></div>
-
-    <div class="relative w-full h-full max-w-[95vw] max-h-[90vh] bg-surface-container-lowest rounded-[2.5rem] overflow-hidden border border-outline-variant/10 shadow-[0_30px_100px_rgba(0,0,0,0.8)] group">
-        <!-- CLOSE BUTTON (X) -->
-        <div class="absolute top-4 right-4 z-[120]">
-            <button id="close-map-btn" class="bg-surface-container-highest/60 backdrop-blur-md hover:bg-error/20 text-on-surface p-3 rounded-full shadow-2xl transition-all border border-outline-variant/20 hover:border-error/40 group active:scale-90">
-                <span class="material-symbols-outlined md-20 group-hover:rotate-90 transition-transform text-2xl">close</span>
+<div id="map-overlay" class="fixed inset-0 z-[100] bg-[#05070a]/80 backdrop-blur-2xl hidden opacity-0 transition-all duration-700 flex items-center justify-center p-6">
+    <div class="relative w-full h-full max-w-[95vw] max-h-[90vh] glass-card rounded-[3rem] overflow-hidden shadow-[0_50px_150px_rgba(0,0,0,0.9)] border border-white/10 group">
+        <!-- CLOSE BUTTON -->
+        <div class="absolute top-8 right-8 z-[120]">
+            <button id="close-map-btn" class="bg-white/5 backdrop-blur-xl hover:bg-error/20 text-white p-4 rounded-full shadow-2xl transition-all border border-white/10 hover:border-error/40 group active:scale-95">
+                <span class="material-symbols-outlined group-hover:rotate-90 transition-transform text-3xl">close</span>
             </button>
         </div>
 
         <div id="map" class="w-full h-full"></div>
+        <div class="map-vignette absolute inset-0 z-[110]"></div>
         
-        <div class="absolute top-8 left-8 z-[110] max-w-xs w-full glass-panel bg-surface-container/60 p-6 rounded-[2rem] border border-primary/20 animate-fade-up pointer-events-none">
-            <h3 class="text-2xl font-headline font-bold mb-1">Global Heat Insight</h3>
-            <p class="text-xs text-on-surface-variant/70 mb-4 font-semibold uppercase tracking-wider">Localized Thermal Monitoring</p>
-            <div class="space-y-2.5">
-                <div class="flex items-center gap-3 text-xs font-bold text-on-surface/80">
-                    <span class="w-2.5 h-2.5 rounded-full bg-tertiary shadow-[0_0_8px_#83e881]"></span> <span>Healthy Environment</span>
+        <div class="absolute top-10 left-10 z-[120] max-w-sm w-full glass-card p-8 rounded-[2.5rem] border border-primary/20 animate-fade-up pointer-events-none">
+            <h3 class="text-3xl font-headline font-black mb-2">Global Insight</h3>
+            <p class="text-[10px] text-white/40 mb-6 font-black uppercase tracking-[0.2em]">Layered Thermal Monitoring</p>
+            <div class="space-y-4">
+                <div class="flex items-center gap-4 text-xs font-black text-white/50 uppercase tracking-widest">
+                    <span class="w-3 h-3 rounded-full bg-tertiary shadow-[0_0_15px_#83e881] border-2 border-white/20"></span> Healthy Zone
                 </div>
-                <div class="flex items-center gap-3 text-xs font-bold text-on-surface/80">
-                    <span class="w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_8px_#feb300]"></span> <span>Moderate Concern</span>
+                <div class="flex items-center gap-4 text-xs font-black text-white/50 uppercase tracking-widest">
+                    <span class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_15px_#feb300] border-2 border-white/20"></span> Alert Phase
                 </div>
-                <div class="flex items-center gap-3 text-xs font-bold text-on-surface/80">
-                    <span class="w-2.5 h-2.5 rounded-full bg-error shadow-[0_0_8px_#ff716c] animate-pulse"></span> <span>Critical Zone</span>
+                <div class="flex items-center gap-4 text-xs font-black text-white/50 uppercase tracking-widest">
+                    <span class="w-3 h-3 rounded-full bg-error shadow-[0_0_15px_#ff716c] border-2 border-white/20 animate-pulse"></span> Critical Tier
                 </div>
             </div>
         </div>
@@ -1049,6 +1131,9 @@ async function executeRiskAnalysis() {
                 document.getElementById('calc-final-hi').innerText = data.heat_index.toFixed(1);
                 document.getElementById('calc-final-rs').innerText = data.risk_score.toFixed(1);
                 
+                // Update Risk Circle
+                updateRiskCircle(data.risk_score);
+                
                 const levelText = document.getElementById('calc-final-level');
                 levelText.innerText = data.risk_level;
                 if(data.risk_level === 'Low') {
@@ -1148,6 +1233,46 @@ const navBtn = document.getElementById('nav-check-btn');
 
 if(heroBtn) heroBtn.addEventListener('click', scrollToInput);
 if(navBtn) navBtn.addEventListener('click', scrollToInput);
+
+// ── MODERN UI ENHANCEMENTS ──
+// Parallax Effect
+document.addEventListener('mousemove', (e) => {
+    const parallaxElements = document.querySelectorAll('.parallax-element');
+    const x = (window.innerWidth - e.pageX * 2) / 100;
+    const y = (window.innerHeight - e.pageY * 2) / 100;
+
+    parallaxElements.forEach(el => {
+        const speed = el.getAttribute('data-parallax-speed') || 0.05;
+        const xOffset = x * speed * 20;
+        const yOffset = y * speed * 20;
+        el.style.transform = `translate3d(${xOffset}px, ${yOffset}px, 0)`;
+    });
+});
+
+// Scroll Reveal
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.animate-on-scroll').forEach(el => scrollObserver.observe(el));
+
+// Progress Circle Animation Helper
+function updateRiskCircle(percentage) {
+    const circle = document.getElementById('risk-circle');
+    if (!circle) return;
+    const circumference = 465; // 2 * PI * 74
+    const offset = circumference - (percentage / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
+}
 </script>
 </body>
 </html>
