@@ -287,6 +287,14 @@ async function executeRiskAnalysis() {
                     grid.classList.remove('hidden');
                     void grid.offsetWidth;
                     grid.style.opacity = '1';
+
+                    // Smooth scroll to results
+                    const resultsSection = document.getElementById('risk-results-section');
+                    if(resultsSection) {
+                        setTimeout(() => {
+                            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
                 }, 300);
             }, 500);
         }
