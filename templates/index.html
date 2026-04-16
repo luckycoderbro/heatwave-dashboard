@@ -207,7 +207,7 @@
 </div>
 </div>
 </section>
-<section class="py-24 px-8 max-w-7xl mx-auto">
+<section id="risk-results-section" class="py-24 px-8 max-w-7xl mx-auto">
 <h2 class="text-4xl md:text-5xl font-headline font-bold mb-10 text-center animate-fade-up">Live Heatwave Risk Analysis</h2>
 
 <div id="error-banner" class="hidden max-w-lg mx-auto mb-10 bg-error/10 text-error px-6 py-4 rounded-xl border border-error/20 items-center justify-center gap-3 text-sm font-bold shadow-lg opacity-0 transition-opacity duration-300">
@@ -1080,6 +1080,14 @@ async function executeRiskAnalysis() {
                     grid.classList.remove('hidden');
                     void grid.offsetWidth;
                     grid.style.opacity = '1';
+
+                    // Smooth scroll to results
+                    const resultsSection = document.getElementById('risk-results-section');
+                    if(resultsSection) {
+                        setTimeout(() => {
+                            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
                 }, 300);
             }, 500);
         }
