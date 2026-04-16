@@ -205,6 +205,13 @@
         .parallax-element {
             transition: transform 0.1s ease-out;
         }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
         .animate-on-scroll {
             opacity: 0;
             transform: translateY(30px);
@@ -518,28 +525,28 @@
 </div>
 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
 <div class="relative">
-<div class="text-8xl font-headline font-black text-surface-container absolute -top-10 -left-4 z-0 opacity-50">1</div>
+<div class="text-8xl font-headline font-black absolute -top-10 -left-4 z-0 text-white/5">1</div>
 <div class="relative z-10 pt-4">
 <h4 class="text-xl font-bold text-on-background mb-3">Live data fetching</h4>
 <p class="text-on-surface-variant text-sm leading-relaxed">Ingesting global meteorological data from localized sensor networks and satellite arrays in real-time.</p>
 </div>
 </div>
 <div class="relative">
-<div class="text-8xl font-headline font-black text-surface-container absolute -top-10 -left-4 z-0 opacity-50">2</div>
+<div class="text-8xl font-headline font-black absolute -top-10 -left-4 z-0 text-white/5">2</div>
 <div class="relative z-10 pt-4">
 <h4 class="text-xl font-bold text-on-background mb-3">Heat index calculation</h4>
 <p class="text-on-surface-variant text-sm leading-relaxed">Combining temperature and humidity to determine the apparent 'feels-like' intensity across urban grids.</p>
 </div>
 </div>
 <div class="relative">
-<div class="text-8xl font-headline font-black text-surface-container absolute -top-10 -left-4 z-0 opacity-50">3</div>
+<div class="text-8xl font-headline font-black absolute -top-10 -left-4 z-0 text-white/5">3</div>
 <div class="relative z-10 pt-4">
 <h4 class="text-xl font-bold text-on-background mb-3">Risk score computation</h4>
 <p class="text-on-surface-variant text-sm leading-relaxed">Cross-referencing indices with historical norms and vulnerability metrics to generate a numerical score.</p>
 </div>
 </div>
 <div class="relative">
-<div class="text-8xl font-headline font-black text-surface-container absolute -top-10 -left-4 z-0 opacity-50">4</div>
+<div class="text-8xl font-headline font-black absolute -top-10 -left-4 z-0 text-white/5">4</div>
 <div class="relative z-10 pt-4">
 <h4 class="text-xl font-bold text-on-background mb-3">ML model classification</h4>
 <p class="text-on-surface-variant text-sm leading-relaxed">Our Random Forest models classify the risk into actionable severity tiers for immediate response.</p>
@@ -1278,7 +1285,7 @@ async function executeRiskAnalysis() {
                 document.getElementById('insight-icon').innerText = insightIcon;
                 // Add icon styling based on color
                 const iconEl = document.getElementById('insight-icon');
-                iconEl.className = \`material-symbols-outlined text-4xl mb-1 \${data.risk_level === 'High' ? 'text-error animate-pulse' : data.risk_level === 'Medium' ? 'text-secondary' : 'text-tertiary'}\`;
+                iconEl.className = `material-symbols-outlined text-4xl mb-1 ${data.risk_level === 'High' ? 'text-error animate-pulse' : data.risk_level === 'Medium' ? 'text-secondary' : 'text-tertiary'}`;
             }
 
             // Results reveal staggered animation
