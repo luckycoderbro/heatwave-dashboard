@@ -153,6 +153,25 @@
         }
         .btn-premium:active { transform: scale(0.96); }
 
+        /* ── INPUT & BUTTON STATES ── */
+        #city-input {
+            caret-color: #ff906d;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        #city-input:focus {
+            box-shadow: 0 0 25px rgba(255, 144, 109, 0.15);
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.08);
+            outline: none;
+        }
+        #analyze-btn:disabled {
+            opacity: 0.7;
+            transform: scale(0.98);
+            cursor: not-allowed;
+            filter: grayscale(0.2);
+            box-shadow: none;
+        }
+
         .btn-secondary-3d {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(8px);
@@ -296,9 +315,16 @@
     <span id="error-text"></span>
 </div>
 
-<div id="loading-spinner" class="hidden flex-col items-center justify-center py-20 opacity-0 transition-opacity duration-300">
-    <div class="w-16 h-16 border-4 border-surface-variant border-t-primary rounded-full animate-spin mb-6"></div>
-    <p class="text-xl font-headline font-bold text-on-surface-variant animate-pulse">Analyzing heatwave risk...</p>
+<div id="loading-spinner" class="hidden flex-col items-center justify-center py-24 opacity-0 transition-all duration-500">
+    <div class="relative w-24 h-24 mb-10 flex items-center justify-center">
+        <div class="absolute inset-0 border-4 border-white/5 rounded-full"></div>
+        <div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
+        <div class="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-30"></div>
+        <span class="material-symbols-outlined text-primary text-4xl animate-pulse cursor-default">radar</span>
+    </div>
+    <div class="h-10 flex items-center justify-center overflow-hidden">
+        <p id="loading-text" class="text-2xl font-headline font-black text-white/80 animate-fade-up tracking-wider transition-all duration-300">Initiating analysis...</p>
+    </div>
 </div>
 
 <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 transition-all duration-700 opacity-100">
@@ -366,6 +392,23 @@
 <span id="val-risk-text" class="px-6 py-2 rounded-full bg-white/5 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] shadow-inner border border-white/5">Calculated Tier</span>
 </div>
 </div>
+
+<!-- INSIGHTS PANEL -->
+<div id="insights-panel" class="mt-12 hidden opacity-0 transition-all duration-700 transform translate-y-8 glass-card rounded-[2.5rem] p-8 parallax-element border border-white/10" data-parallax-speed="0.02">
+    <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div class="w-16 h-16 shrink-0 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
+            <span class="material-symbols-outlined text-4xl" id="insight-icon">psychology</span>
+        </div>
+        <div class="text-center md:text-left">
+            <h3 class="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-2">AI Analysis</h3>
+            <h4 class="text-2xl font-headline font-black text-white mb-2">Why this risk?</h4>
+            <div id="insight-text" class="text-white/70 font-medium leading-relaxed">
+                <!-- dynamic text here -->
+            </div>
+        </div>
+    </div>
+</div>
+
 </section>
 
 <!-- RISK FACTORS SECTION -->
@@ -1065,19 +1108,56 @@ async function executeRiskAnalysis() {
     const city = document.getElementById('city-input').value;
     if (!city) return;
     
-    // UI Loading state
-    document.getElementById('analyze-btn').innerText = "Calculating...";
+    // UI Button state
+    const analyzeBtn = document.getElementById('analyze-btn');
+    analyzeBtn.disabled = true;
+    analyzeBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Calculating...';
     
     const grid = document.getElementById('results-grid');
     const spinner = document.getElementById('loading-spinner');
     const errorBanner = document.getElementById('error-banner');
     const errorText = document.getElementById('error-text');
+    const insightsPanel = document.getElementById('insights-panel');
     
     errorBanner.classList.add('hidden');
     errorBanner.classList.remove('flex');
     errorBanner.style.opacity = '0';
-    
     grid.style.opacity = '0';
+    if(insightsPanel) {
+        insightsPanel.style.opacity = '0';
+        insightsPanel.classList.add('hidden');
+    }
+    
+    // Scroll down to results section immediately
+    const resultsSection = document.getElementById('risk-results-section');
+    if(resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // Setup Smart Loading sequence
+    const loadingMessages = [
+        "Analyzing temperature algorithms...",
+        "Processing humidity saturation...",
+        "Fetching hyper-local AQI data...",
+        "Calculating perceived heat index...",
+        "Computing final risk score..."
+    ];
+    let msgIndex = 0;
+    const loadingTextEl = document.getElementById('loading-text');
+    if (loadingTextEl) loadingTextEl.innerText = "Initiating analysis...";
+    
+    let loadingInterval = setInterval(() => {
+        if (!loadingTextEl) return;
+        loadingTextEl.style.opacity = '0';
+        loadingTextEl.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            msgIndex = (msgIndex + 1) % loadingMessages.length;
+            loadingTextEl.innerText = loadingMessages[msgIndex];
+            loadingTextEl.style.opacity = '1';
+            loadingTextEl.style.transform = 'translateY(0)';
+        }, 300);
+    }, 1800);
+
     setTimeout(() => {
         grid.classList.add('hidden');
         spinner.classList.remove('hidden');
@@ -1090,22 +1170,25 @@ async function executeRiskAnalysis() {
         const response = await fetch(`/get-risk?city=${encodeURIComponent(city)}`);
         const data = await response.json();
         
+        // Artificial delay for loading experience
+        await new Promise(r => setTimeout(r, 2500));
+        clearInterval(loadingInterval);
+        
         if (data.error) {
+            spinner.style.opacity = '0';
             setTimeout(() => {
-                spinner.style.opacity = '0';
-                setTimeout(() => {
-                    spinner.classList.add('hidden');
-                    spinner.classList.remove('flex');
-                    errorText.innerText = data.error;
-                    errorBanner.classList.remove('hidden');
-                    errorBanner.classList.add('flex');
-                    void errorBanner.offsetWidth;
-                    errorBanner.style.opacity = '1';
-                    
-                    grid.classList.remove('hidden');
-                    void grid.offsetWidth;
-                    grid.style.opacity = '1';
-                }, 300);
+                spinner.classList.add('hidden');
+                spinner.classList.remove('flex');
+                errorText.innerText = data.error;
+                errorBanner.classList.remove('hidden');
+                errorBanner.classList.add('flex');
+                void errorBanner.offsetWidth;
+                errorBanner.style.opacity = '1';
+                grid.classList.remove('hidden');
+                void grid.offsetWidth;
+                grid.style.opacity = '1';
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<span class="material-symbols-outlined">analytics</span> Analyze Risk';
             }, 500);
         } else {
             document.getElementById('val-temp').innerText = data.temperature;
@@ -1131,7 +1214,6 @@ async function executeRiskAnalysis() {
                 document.getElementById('calc-final-hi').innerText = data.heat_index.toFixed(1);
                 document.getElementById('calc-final-rs').innerText = data.risk_score.toFixed(1);
                 
-                // Update Risk Circle
                 updateRiskCircle(data.risk_score);
                 
                 const levelText = document.getElementById('calc-final-level');
@@ -1156,47 +1238,114 @@ async function executeRiskAnalysis() {
                     riskText.className = "px-4 py-1 rounded-full bg-gradient-to-r from-error to-error-container text-on-primary-fixed text-xs font-bold uppercase tracking-wider";
                 }
             }
-            setTimeout(() => {
-                spinner.style.opacity = '0';
-                setTimeout(() => {
-                    spinner.classList.add('hidden');
-                    spinner.classList.remove('flex');
-                    
-                    grid.classList.remove('hidden');
-                    void grid.offsetWidth;
-                    grid.style.opacity = '1';
+            
+            // Dynamic theme update & Insights logic
+            let insightMsg = "";
+            let insightIcon = "info";
+            const blobs = document.querySelectorAll('.bg-blobs .blob');
 
-                    // Smooth scroll to results
-                    const resultsSection = document.getElementById('risk-results-section');
-                    if(resultsSection) {
-                        setTimeout(() => {
-                            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }, 100);
-                    }
-                }, 300);
-            }, 500);
-        }
-    } catch(e) {
-        setTimeout(() => {
+            if(data.risk_level === 'High') {
+                insightIcon = "warning";
+                blobs.forEach(b => b.style.setProperty('--blob-color', '#ff3b3b'));
+                document.body.className = "antialiased selection:bg-error selection:text-white";
+                if(data.heat_index > 40) {
+                     insightMsg = "Critical heat index derived from high temperature and humidity. Prolonged exposure can lead to severe heatstroke.";
+                } else if(data.aqi > 150) {
+                     insightMsg = "Dangerous combination of high heat and poor air quality. Avoid outdoor activities to prevent severe respiratory and thermal stress.";
+                } else {
+                     insightMsg = "Overall risk parameters have crossed critical thresholds. Immediate cooling interventions are necessary.";
+                }
+            } else if(data.risk_level === 'Medium') {
+                insightIcon = "thermostat";
+                blobs.forEach(b => b.style.setProperty('--blob-color', '#feb300'));
+                document.body.className = "antialiased selection:bg-secondary selection:text-yellow-900";
+                if(data.humidity > 60 && data.temperature > 32) {
+                     insightMsg = "High humidity is elevating the perceived heat index, restricting natural evaporative cooling.";
+                } else if(data.aqi > 100) {
+                     insightMsg = "Elevated AQI compounds the moderate heat stress. Sensitive groups should exercise caution outdoors.";
+                } else {
+                     insightMsg = "Temperatures are above normal comfort zones. Stay hydrated and monitor conditions.";
+                }
+            } else {
+                insightIcon = "check_circle";
+                blobs.forEach(b => b.style.setProperty('--blob-color', '#83e881'));
+                document.body.className = "antialiased selection:bg-tertiary selection:text-green-900";
+                insightMsg = "Environmental parameters are within healthy thresholds. Urban density and current weather conditions pose minimal threat.";
+            }
+
+            if(document.getElementById('insight-text')) {
+                document.getElementById('insight-text').innerText = insightMsg;
+                document.getElementById('insight-icon').innerText = insightIcon;
+                // Add icon styling based on color
+                const iconEl = document.getElementById('insight-icon');
+                iconEl.className = \`material-symbols-outlined text-4xl mb-1 \${data.risk_level === 'High' ? 'text-error animate-pulse' : data.risk_level === 'Medium' ? 'text-secondary' : 'text-tertiary'}\`;
+            }
+
+            // Results reveal staggered animation
             spinner.style.opacity = '0';
             setTimeout(() => {
                 spinner.classList.add('hidden');
                 spinner.classList.remove('flex');
                 
-                errorText.innerText = "Unable to fetch data";
-                errorBanner.classList.remove('hidden');
-                errorBanner.classList.add('flex');
-                void errorBanner.offsetWidth;
-                errorBanner.style.opacity = '1';
-                
                 grid.classList.remove('hidden');
+                
+                // Prepare cards for stagger
+                const cards = grid.querySelectorAll('.glass-card');
+                cards.forEach(c => {
+                    c.style.transition = 'none';
+                    c.style.opacity = '0';
+                    c.style.transform = 'translateY(40px)';
+                });
+                
                 void grid.offsetWidth;
                 grid.style.opacity = '1';
-            }, 300);
+                
+                cards.forEach((c, i) => {
+                    setTimeout(() => {
+                        c.style.transition = 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
+                        c.style.opacity = '1';
+                        c.style.transform = 'translateY(0)';
+                    }, i * 150);
+                });
+                
+                if(insightsPanel) {
+                    insightsPanel.classList.remove('hidden');
+                    insightsPanel.style.transition = 'none';
+                    insightsPanel.style.opacity = '0';
+                    insightsPanel.style.transform = 'translateY(40px)';
+                    void insightsPanel.offsetWidth;
+                    
+                    setTimeout(() => {
+                        insightsPanel.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
+                        insightsPanel.style.opacity = '1';
+                        insightsPanel.style.transform = 'translateY(0)';
+                    }, cards.length * 150 + 200);
+                }
+
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<span class="material-symbols-outlined">analytics</span> Analyze Risk';
+
+            }, 500);
+        }
+    } catch(e) {
+        clearInterval(loadingInterval);
+        spinner.style.opacity = '0';
+        setTimeout(() => {
+            spinner.classList.add('hidden');
+            spinner.classList.remove('flex');
+            errorText.innerText = "Unable to fetch data";
+            errorBanner.classList.remove('hidden');
+            errorBanner.classList.add('flex');
+            void errorBanner.offsetWidth;
+            errorBanner.style.opacity = '1';
+            grid.classList.remove('hidden');
+            void grid.offsetWidth;
+            grid.style.opacity = '1';
+            
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = '<span class="material-symbols-outlined">analytics</span> Analyze Risk';
         }, 500);
     }
-    
-    document.getElementById('analyze-btn').innerHTML = '<span class="material-symbols-outlined">analytics</span> Check Risk';
 }
 
 document.getElementById('analyze-btn').addEventListener('click', executeRiskAnalysis);
