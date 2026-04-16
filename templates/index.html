@@ -161,7 +161,7 @@
 <a class="text-[#e4e5ee]/70 hover:text-[#ff906d] text-sm transition-colors duration-300" href="#">Use cases</a>
 <a class="text-[#e4e5ee]/70 hover:text-[#ff906d] text-sm transition-colors duration-300" href="#">About</a>
 </div>
-<button class="bg-primary hover:bg-primary-container text-on-primary-fixed px-5 py-2 rounded-full font-semibold text-sm transition-all duration-300 scale-95 active:scale-90">
+<button id="nav-check-btn" class="bg-primary hover:bg-primary-container text-on-primary-fixed px-5 py-2 rounded-full font-semibold text-sm transition-all duration-300 scale-95 active:scale-90">
                 Check Risk
             </button>
 </div>
@@ -184,7 +184,7 @@
                     Real-time environmental analysis for smarter climate awareness. Harness ML to predict and mitigate hyper-local thermal risks.
                 </p>
 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-<button class="w-full sm:w-auto bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-8 py-4 rounded-full font-bold text-lg shadow-[0_20px_50px_rgba(255,144,109,0.2)] transition-transform hover:scale-105 active:scale-95">
+<button id="hero-check-btn" class="w-full sm:w-auto bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-8 py-4 rounded-full font-bold text-lg shadow-[0_20px_50px_rgba(255,144,109,0.2)] transition-transform hover:scale-105 active:scale-95">
                         Check Risk Now
                     </button>
 <button id="view-map-btn" class="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-lg text-primary border border-outline-variant/30 hover:bg-surface-container transition-colors">
@@ -192,7 +192,7 @@
                     </button>
 </div>
 </div>
-<div class="mt-20 w-full max-w-5xl mx-auto px-4">
+<div id="city-input-section" class="mt-20 w-full max-w-5xl mx-auto px-4">
 <div class="bg-surface-container-low rounded-3xl p-2 border border-outline-variant/10 shadow-2xl">
 <div class="flex flex-col md:flex-row items-center gap-2">
 <div class="relative flex-grow w-full">
@@ -1118,6 +1118,28 @@ if(mapBtn) mapBtn.addEventListener('click', () => toggleMap(true));
 
 const closeMapBtn = document.getElementById('close-map-btn');
 if(closeMapBtn) closeMapBtn.addEventListener('click', () => toggleMap(false));
+
+// Smooth scroll logic for "Check Risk" buttons
+const scrollToInput = () => {
+    const target = document.getElementById('city-input-section');
+    const inputField = document.getElementById('city-input');
+    
+    if(target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Optional: Focus cursor after a short delay for smooth effect
+        if(inputField) {
+            setTimeout(() => {
+                inputField.focus();
+            }, 800);
+        }
+    }
+};
+
+const heroBtn = document.getElementById('hero-check-btn');
+const navBtn = document.getElementById('nav-check-btn');
+
+if(heroBtn) heroBtn.addEventListener('click', scrollToInput);
+if(navBtn) navBtn.addEventListener('click', scrollToInput);
 </script>
 </body>
 </html>
